@@ -7,7 +7,6 @@ import javax.persistence.*;
 
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cne")
     private Integer cne;
 
@@ -18,4 +17,37 @@ public class Student {
     @Enumerated(EnumType.STRING)
     @Column(name = "year")
     private Year year;
+
+    public Student(Integer cne, User user, Year year) {
+        this.cne = cne;
+        this.user = user;
+        this.year = year;
+    }
+
+    public Student() {
+    }
+
+    public Integer getCne() {
+        return cne;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Year getYear() {
+        return year;
+    }
+
+    public void setCne(Integer cne) {
+        this.cne = cne;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setYear(Year year) {
+        this.year = year;
+    }
 }
