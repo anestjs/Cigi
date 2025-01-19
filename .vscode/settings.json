@@ -1,6 +1,11 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "c:\\Users\\Anas\\Documents\\mysql-connector-j-9.1.0.jar"
+        "c:\\Users\\Anas\\Documents\\mysql-connector-j-9.1.0.jar",
+        "c:\\Users\\Anas\\Downloads\\hibernate-search-5.8.0.Final-dist\\hibernate-search-5.8.0.Final\\dist\\lib\\required\\hibernate-core-5.2.11.Final.jar",
+        "c:\\Users\\Anas\\Downloads\\hibernate-search-5.8.0.Final-dist\\jackson-annotations-2.13.3.jar",
+        "c:\\Users\\Anas\\Downloads\\hibernate-search-5.8.0.Final-dist\\jackson-databind-2.13.3.jar",
+        "c:\\Users\\Anas\\Downloads\\hibernate-search-5.8.0.Final-dist\\jackson-core-2.13.3.jar",
+        "c:\\Users\\Anas\\Downloads\\hibernate-search-5.8.0.Final-dist\\hibernate-search-5.8.0.Final\\dist\\lib\\provided\\hibernate-jpa-2.1-api-1.0.0.Final.jar"
     ]
 }
