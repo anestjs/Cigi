@@ -2,5 +2,9 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "c:\\Users\\Anas\\Documents\\mysql-connector-j-9.1.0.jar"
+    ],
+    "cSpell.words": [
+        "d'ensignant",
+        "d'Etudiant"
     ]
 }
