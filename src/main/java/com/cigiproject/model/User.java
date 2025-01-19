@@ -23,12 +23,26 @@ public class User {
     @Column(name = "role")
     private Role role ;
 
-    public User(int user_id, String firstname, String lastname, String email, Role role) {
+    @Column(name = "password")
+    private String password ;
+
+
+    public User(int user_id, String firstname, String lastname, String email, Role role, String password) {
         this.user_id = user_id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.role = role;
+        this.password = password;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public User() {
+        //TODO Auto-generated constructor stub
     }
     public int getUser_id() {
         return user_id;
