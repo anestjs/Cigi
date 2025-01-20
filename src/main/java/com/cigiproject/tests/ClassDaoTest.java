@@ -16,7 +16,7 @@ public class ClassDaoTest {
         Class newClass = new Class();
 
         newClass.setStudent_count(30);
-        newClass.setYear(Year._1);
+        newClass.setYear(Year._3);
 
         boolean isSaved = classDao.save(newClass);
         System.out.println("Class saved: " + isSaved);

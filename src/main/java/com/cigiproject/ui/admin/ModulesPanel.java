@@ -65,16 +65,15 @@ public class ModulesPanel extends JPanel {
 
         // Filters
         semesterFilter = new JComboBox<>(Semester.values());
-        yearFilter = new JComboBox<>(Year.values());
+
         // JTextField searchField = createStyledTextField("Search modules...");
 
         semesterFilter.addActionListener(e -> filterTable());
-        yearFilter.addActionListener(e -> filterTable());
 
+        
         searchFilterPanel.add(new JLabel("Semester:"));
         searchFilterPanel.add(semesterFilter);
-        searchFilterPanel.add(new JLabel("Year:"));
-        searchFilterPanel.add(yearFilter);
+ 
         // searchFilterPanel.add(searchField);
 
         headerPanel.add(searchFilterPanel, BorderLayout.EAST);
@@ -155,6 +154,7 @@ public class ModulesPanel extends JPanel {
     }
 
 
+
     private JPanel createActionPanel() {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         actionPanel.setBackground(BACKGROUND_COLOR);
@@ -163,8 +163,7 @@ public class ModulesPanel extends JPanel {
         JButton addButton = createStyledButton("Add Module", UMI_BLUE);
         JButton editButton = createStyledButton("Edit", UMI_ORANGE);
         JButton deleteButton = createStyledButton("Delete", Color.RED);
-        JButton assignButton = createStyledButton("Assign to Class", new Color(50, 150, 50));
-    
+     
         addButton.addActionListener(e -> {
             AddModuleDialog addDialog = new AddModuleDialog((JFrame) SwingUtilities.getWindowAncestor(this));
             addDialog.setVisible(true);
@@ -190,15 +189,44 @@ public class ModulesPanel extends JPanel {
             }
         });
     
+        // Add delete functionality
+        deleteButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int moduleId = (int) tableModel.getValueAt(selectedRow, 0);
+    
+                // Confirm deletion with the user
+                int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to delete this module?",
+                    "Confirm Deletion",
+                    JOptionPane.YES_NO_OPTION
+                );
+    
+                if (confirm == JOptionPane.YES_OPTION) {
+                    ModuleDaoImpl moduleDao = new ModuleDaoImpl();
+                    boolean isDeleted = moduleDao.delete(moduleId);
+    
+                    if (isDeleted) {
+                        JOptionPane.showMessageDialog(this, "Module deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        populateTable(); // Refresh the table after deletion
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Failed to delete module.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a module to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+    
         actionPanel.add(addButton);
         actionPanel.add(editButton);
         actionPanel.add(deleteButton);
-        actionPanel.add(assignButton);
     
         return actionPanel;
     }
 
-    // private JPanel createPaginationPanel() {
+   // private JPanel createPaginationPanel() {
     //     JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
     //     paginationPanel.setBackground(BACKGROUND_COLOR);
 
@@ -236,11 +264,9 @@ public class ModulesPanel extends JPanel {
 
     private void filterTable() {
         Semester selectedSemester = (Semester) semesterFilter.getSelectedItem();
-        Year selectedYear = (Year) yearFilter.getSelectedItem();
-
+ 
         List<Module> filteredModules = allModules.stream()
                 .filter(module -> selectedSemester == null || module.getSemester() == selectedSemester)
-                .filter(module -> selectedYear == null || module.getYear() == selectedYear)
                 .toList();
 
         updateTableData(filteredModules);

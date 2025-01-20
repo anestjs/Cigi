@@ -202,6 +202,13 @@ public class ProfPanel extends JPanel {
         JButton editButton = createStyledButton("Edit", UMI_ORANGE);
         JButton deleteButton = createStyledButton("Delete", Color.RED);
 
+        addButton.addActionListener(e -> {
+            AddProfessorDialog dialog = new AddProfessorDialog((JFrame) SwingUtilities.getWindowAncestor(ProfPanel.this));
+            dialog.setVisible(true);
+            // Refresh the table after adding a professor
+            populateTable(tableModel);
+        });
+        
         actionPanel.add(addButton);
         actionPanel.add(editButton);
         actionPanel.add(deleteButton);

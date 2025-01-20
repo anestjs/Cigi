@@ -43,6 +43,9 @@ public class EditModuleDialog extends JDialog {
         semesterComboBox.setSelectedItem(module.getSemester());
         add(semesterComboBox);
 
+        // Add listener to update year when semester changes
+        semesterComboBox.addActionListener(e -> updateYearBasedOnSemester());
+
         add(new JLabel("Year:"));
         yearComboBox = new JComboBox<>(Year.values());
         yearComboBox.setSelectedItem(module.getYear());
@@ -67,10 +70,32 @@ public class EditModuleDialog extends JDialog {
         add(cancelButton);
     }
 
+    private void updateYearBasedOnSemester() {
+        Semester selectedSemester = (Semester) semesterComboBox.getSelectedItem();
+        Year year = determineYearFromSemester(selectedSemester);
+        yearComboBox.setSelectedItem(year);
+    }
+
+    private Year determineYearFromSemester(Semester semester) {
+        switch (semester) {
+            case S1:
+            case S2:
+                return Year._1;
+            case S3:
+            case S4:
+                return Year._2;
+            case S5:
+            case S6:
+                return Year._3;
+            default:
+                throw new IllegalArgumentException("Invalid semester: " + semester);
+        }
+    }
+
     private void saveModule() {
         module.setName(nameField.getText());
         module.setSemester((Semester) semesterComboBox.getSelectedItem());
-        module.setYear((Year) yearComboBox.getSelectedItem());
+        module.setYear((Year) yearComboBox.getSelectedItem()); // Year is updated based on semester
         module.setProfessor((Professor) professorComboBox.getSelectedItem());
         module.setClassEntity((Class) classComboBox.getSelectedItem());
 

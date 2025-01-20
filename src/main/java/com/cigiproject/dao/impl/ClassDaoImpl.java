@@ -50,19 +50,20 @@ public class ClassDaoImpl implements ClassDao {
     }
 
     @Override
-    public boolean save(Class entity) {
-        String sql = "INSERT INTO classes (name, student_count) VALUES (?, ?)";
-        try (Connection conn = DatabaseConfig.connexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, entity.getName());
-            stmt.setInt(2, entity.getStudent_count());
-            int rowsInserted = stmt.executeUpdate();
-            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+public boolean save(Class entity) {
+    String sql = "INSERT INTO classes (name, student_count, year) VALUES (?, ?, ?)";
+    try (Connection conn = DatabaseConfig.connexion();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, entity.getName());
+        stmt.setInt(2, entity.getStudent_count());
+        stmt.setString(3, entity.getYear().name()); // Save the year as a string
+        int rowsInserted = stmt.executeUpdate();
+        return rowsInserted > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
 
     @Override
     public boolean update(Class entity) {
@@ -165,10 +166,20 @@ public class ClassDaoImpl implements ClassDao {
         return false;
     }
 
+   
     private Class mapRowToClass(ResultSet rs) throws SQLException {
         Class classEntity = new Class();
         classEntity.setClass_id(rs.getInt("class_id"));
         classEntity.setStudent_count(rs.getInt("student_count"));
+        
+        // Retrieve the year from the database and set it in the Class object
+        String yearStr = rs.getString("year"); // Assuming 'year' is stored as a string in the database
+        if (yearStr != null) {
+            classEntity.setYear(Year.valueOf(yearStr)); // Convert the string to the Year enum
+        }
+        
+        // Set the name dynamically based on the year
+        classEntity.setName(); // This will generate the name as "CIGI" + year
         return classEntity;
     }
 }
