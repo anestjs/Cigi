@@ -12,7 +12,7 @@ public class MainEtudiant {
         SwingUtilities.invokeLater(() -> new EtudiantDashboard());
     }
 
-    static class EtudiantDashboard extends JFrame {
+    public static class EtudiantDashboard extends JFrame {
 
         private JPanel contentPanel;
 
