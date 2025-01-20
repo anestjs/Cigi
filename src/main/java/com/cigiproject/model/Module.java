@@ -6,6 +6,31 @@ import javax.persistence.*;
 @Table(name = "modules")
 public class Module {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "module_id")
+    private Integer module_id;
+
+    @Column(name = "name", length = 255)
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "semester")
+    private Semester semester;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "year")
+    private Year year;
+
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
+
+    @OneToOne
+    @JoinColumn(name = "class_id", unique = true) // One-to-one relationship
+    private Class classEntity; // Add this field
+
+    // Getters and setters
     public Integer getModule_id() {
         return module_id;
     }
@@ -46,24 +71,11 @@ public class Module {
         this.professor = professor;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "module_id")
-    private Integer module_id;
+    public Class getClassEntity() {
+        return classEntity;
+    }
 
-    @Column(name = "name", length = 255)
-    private String name;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "semester")
-    private Semester semester;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "year")
-    private Year year;
-
-    @ManyToOne
-    @JoinColumn(name = "professor_id")
-    private Professor professor;
-
+    public void setClassEntity(Class classEntity) {
+        this.classEntity = classEntity;
+    }
 }
