@@ -239,7 +239,7 @@ public class ProfessorDaoImpl implements ProfessorDao {
                 Class classEntity = new Class();
                 classEntity.setClass_id(rs.getInt("class_id"));
                 classEntity.setYear(Year.valueOf(rs.getString("year")));
-                classEntity.setStudentCount(rs.getInt("student_count"));
+                classEntity.setStudent_count(rs.getInt("student_count"));
                 return classEntity;
             }
         } catch (SQLException e) {
