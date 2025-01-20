@@ -26,10 +26,10 @@ public class Module {
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
-    @OneToOne
-    @JoinColumn(name = "class_id", unique = true) // One-to-one relationship
-    private Class classEntity; // Add this field
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id") // Many-to-one relationship (no unique = true)
+    private Class classEntity;
+    
     // Getters and setters
     public Integer getModule_id() {
         return module_id;

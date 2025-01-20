@@ -1,5 +1,7 @@
 package main.java.com.cigiproject.model;
 
+import java.util.List;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,10 +20,23 @@ public class Class {
     @Column(name = "student_count")
     private Integer student_count;
 
-    @OneToOne(mappedBy = "classEntity", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY)
     private Module module; // One-to-one relationship
 
-    // Getters and setters
+    public String getName() {
+        return "CIGI" + (year != null ? year.toString() : "");
+    }
+
+    @Override
+    public String toString() {
+        return getName(); // Example: "Mathematics 101"
+    }
+
+
+    @OneToMany(mappedBy = "classEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Module> modules;  
+
+
     public Integer getClass_id() {
         return class_id;
     }
@@ -53,4 +68,13 @@ public class Class {
     public void setModule(Module module) {
         this.module = module;
     }
+     public List<Module> getModules() {
+        return modules;
+    }
+
+    public void setModules(List<Module> modules) {
+        this.modules = modules;
+    }
+
 }
+

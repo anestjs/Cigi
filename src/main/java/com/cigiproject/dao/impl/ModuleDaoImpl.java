@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 public class ModuleDaoImpl implements ModuleDao {
 
     private ProfessorDao professorDao; // Assuming you have a ProfessorDao
@@ -90,13 +91,28 @@ public class ModuleDaoImpl implements ModuleDao {
     }
 
     @Override
-    public List<Module> getModulesForClass(Integer classId) {
-        List<Module> modules = new ArrayList<>();
+    public Module getModuleForClass(Integer classId) {
         String sql = "SELECT * FROM modules WHERE class_id = ?";
         try (Connection conn = DatabaseConfig.connexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, classId);
             ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapRowToModule(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Module> getUnassignedModules() {
+        List<Module> modules = new ArrayList<>();
+        String sql = "SELECT * FROM modules WHERE class_id IS NULL";
+        try (Connection conn = DatabaseConfig.connexion();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Module module = mapRowToModule(rs);
                 modules.add(module);
@@ -149,7 +165,7 @@ public class ModuleDaoImpl implements ModuleDao {
             stmt.setString(2, entity.getSemester().name());
             stmt.setString(3, entity.getYear().name());
             stmt.setInt(4, entity.getProfessor().getProfessor_id());
-            stmt.setInt(5, entity.);
+            stmt.setInt(5, entity.getClassEntity().getClass_id());
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
         } catch (SQLException e) {
@@ -167,7 +183,7 @@ public class ModuleDaoImpl implements ModuleDao {
             stmt.setString(2, entity.getSemester().name());
             stmt.setString(3, entity.getYear().name());
             stmt.setInt(4, entity.getProfessor().getProfessor_id());
-            stmt.setInt(5, entity.getClass().getClass_id());
+            stmt.setInt(5, entity.getClassEntity().getClass_id());
             stmt.setInt(6, entity.getModule_id());
             int rowsUpdated = stmt.executeUpdate();
             return rowsUpdated > 0;
@@ -206,7 +222,7 @@ public class ModuleDaoImpl implements ModuleDao {
         // Fetch and set the Class object
         int classId = rs.getInt("class_id");
         Optional<Class> classEntity = classDao.findById(classId);
-        classEntity.ifPresent(module::setClass);
+        classEntity.ifPresent(module::setClassEntity);
 
         return module;
     }

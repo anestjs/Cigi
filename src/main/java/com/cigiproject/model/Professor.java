@@ -39,6 +39,9 @@ public class Professor {
     public void setUser(User user) {
         this.user = user;
     }
-
+    @Override
+    public String toString() {
+        return user.getFirstname() + " " + user.getLastname(); // Example: "John Doe"
+    }
 
 }
