@@ -42,6 +42,7 @@ public interface AdminDao extends BaseDao<User> {
     void deleteModule(Integer moduleId);
     Module getModuleById(Integer moduleId);
     List<Module> getAllModules();
+    
     List<Module> getModulesBySemester(Semester semester); 
     List<Module> getModulesByYear(Year year); 
     boolean assignModuleToClass(Integer moduleId, Integer classId);

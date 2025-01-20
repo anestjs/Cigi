@@ -1,6 +1,8 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "c:\\Users\\Anas\\Documents\\mysql-connector-j-9.1.0.jar"
+        "c:\\Users\\Anas\\Documents\\mysql-connector-j-9.1.0.jar",
+        "c:\\Users\\ayaqa\\Downloads\\hibernate-search-5.8.0.Final-dist\\hibernate-search-5.8.0.Final\\dist\\lib\\provided\\hibernate-jpa-2.1-api-1.0.0.Final.jar",
+        "c:\\Users\\ayaqa\\OneDrive\\Desktop\\mysql-connector-j-9.1.0.jar"
     ]
 }

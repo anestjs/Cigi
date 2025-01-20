@@ -4,8 +4,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "classes")
-
 public class Class {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "class_id")
@@ -16,17 +16,12 @@ public class Class {
     private Year year;
 
     @Column(name = "student_count")
-    private Integer studentCount;
+    private Integer student_count;
 
-    public Class(Integer class_id, Year year, Integer studentCount) {
-        this.class_id = class_id;
-        this.year = year;
-        this.studentCount = studentCount;
-    }
+    @OneToOne(mappedBy = "classEntity", fetch = FetchType.LAZY)
+    private Module module; // One-to-one relationship
 
-    public Class() {
-    }
-
+    // Getters and setters
     public Integer getClass_id() {
         return class_id;
     }
@@ -43,11 +38,19 @@ public class Class {
         this.year = year;
     }
 
-    public Integer getStudentCount() {
-        return studentCount;
+    public Integer getStudent_count() {
+        return student_count;
     }
 
-    public void setStudentCount(Integer studentCount) {
-        this.studentCount = studentCount;
+    public void setStudent_count(Integer student_count) {
+        this.student_count = student_count;
+    }
+
+    public Module getModule() {
+        return module;
+    }
+
+    public void setModule(Module module) {
+        this.module = module;
     }
 }
