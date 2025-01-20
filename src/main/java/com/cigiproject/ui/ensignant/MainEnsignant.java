@@ -12,7 +12,7 @@ public class MainEnsignant {
         SwingUtilities.invokeLater(() -> new EnsignantDashboard());
     }
 
-    static class EnsignantDashboard extends JFrame {
+    public static class EnsignantDashboard extends JFrame {
 
         private JPanel contentPanel;
 
