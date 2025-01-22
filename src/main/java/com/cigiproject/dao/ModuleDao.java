@@ -19,5 +19,7 @@ public interface ModuleDao extends BaseDao<Module> {
     Module getModuleForClass(Integer classId);
 
     List<Module> getUnassignedModules();
+
+    List<Module> getClassModules(Integer class_id);
     
 }

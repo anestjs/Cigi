@@ -63,4 +63,9 @@ public class Grade {
     public void setGrade(String grade) {
         this.grade = grade;
     }
+
+    public Object getStudentCne() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getStudentCne'");
+    }
 }

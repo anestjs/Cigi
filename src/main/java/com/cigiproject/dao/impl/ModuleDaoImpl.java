@@ -226,4 +226,10 @@ public class ModuleDaoImpl implements ModuleDao {
 
         return module;
     }
+
+    @Override
+    public List<Module> getClassModules(Integer class_id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getClassModules'");
+    }
 }

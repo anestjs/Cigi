@@ -24,7 +24,7 @@ public class Class {
     private Module module; // One-to-one relationship
 
     public String getName() {
-        return "CIGI" + (year != null ? year.toString() : "");
+        return "CIGI" + (this.year != null ? this.year.toString() : "");
     }
 
     @Override

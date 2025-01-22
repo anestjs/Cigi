@@ -1,6 +1,7 @@
 package main.java.com.cigiproject.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import main.java.com.cigiproject.model.*;
 import main.java.com.cigiproject.model.Class;
@@ -24,4 +25,8 @@ public interface ProfessorDao extends BaseDao<Professor> {
     List<Grade> getGradesForModule(Integer moduleId);
 
     Grade getGradeForStudentInModule(Integer studentCne, Integer moduleId);
+    
+
+
+
 }
