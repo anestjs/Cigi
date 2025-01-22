@@ -17,7 +17,7 @@ public class MainCigiUi {
         private JPanel contentPanel;
 
         public CIGIDashboard() {
-            setTitle("CIGI Dashboard - Gestion des Cycles d'Ingénieurs");
+            setTitle("Tableau de Bord CIGI - Gestion des Cycles d'Ingénieurs");
 
             setSize(1000, 700);
             setResizable(false);
@@ -85,19 +85,19 @@ public class MainCigiUi {
             sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
             sideBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            JLabel menuTitle = new JLabel("Dashboard du directeur", SwingConstants.CENTER);
+            JLabel menuTitle = new JLabel("Tableau de bord du directeur", SwingConstants.CENTER);
             menuTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
             menuTitle.setForeground(Color.WHITE);
             menuTitle.setBorder(new EmptyBorder(20, 12, 20, 10));
 
-            String[] menuItems = {"Dashboard", "Étudiants", "Gestion des Modules", "Professeurs", "Statistiques", "Settings", "Se Déconnecter"};
+            String[] menuItems = {"Tableau de bord", "Étudiants", "Gestion des Modules", "Professeurs", "Paramètres", "Se Déconnecter"};
             String[] iconPaths = {
                 "../../../../../resources/icons/student.png",
                 "../../../../../resources/icons/student.png",
                 // "../../../../../resources/icons/notes.png",
                 "../../../../../resources/icons/modules.png",
                 "../../../../../resources/icons/teacher.png",
-                "../../../../../resources/icons/stats.png",
+                // "../../../../../resources/icons/stats.png",
                 "../../../../../resources/icons/student.png",
                 "../../../../../resources/icons/logout.png"
             };
@@ -110,7 +110,7 @@ public class MainCigiUi {
                 String panelName = menuItems[i];
                 menuButton.addActionListener(e -> {
                     if (panelName.equals("Se Déconnecter")) {
-                        // Handle logout action
+                        // Gestion de la déconnexion
                         int confirm = JOptionPane.showConfirmDialog(
                             CIGIDashboard.this,
                             "Êtes-vous sûr de vouloir vous déconnecter ?",
@@ -118,8 +118,8 @@ public class MainCigiUi {
                             JOptionPane.YES_NO_OPTION
                         );
                         if (confirm == JOptionPane.YES_OPTION) {
-                            dispose(); // Close the current window
-                            // You can add additional logout logic here (e.g., return to login screen)
+                            dispose(); // Ferme la fenêtre actuelle
+                            // Vous pouvez ajouter une logique de déconnexion ici (par exemple, revenir à l'écran de connexion)
                         }
                     } else {
                         CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
@@ -201,17 +201,17 @@ public class MainCigiUi {
             JPanel statsPanel = new StatsPanel();
             JPanel settingsPanel = new SettingsPanel();
 
-            contentPanel.add(dashboardPanel, "Dashboard");
+            contentPanel.add(dashboardPanel, "Tableau de bord");
             contentPanel.add(studentsPanel, "Étudiants");
             contentPanel.add(notesPanel, "Gestion des Notes");
             contentPanel.add(modulesPanel, "Gestion des Modules");
             contentPanel.add(profPanel, "Professeurs");
             contentPanel.add(statsPanel, "Statistiques");
-            contentPanel.add(settingsPanel, "Settings");
+            contentPanel.add(settingsPanel, "Paramètres");
 
-            // Set the default view to Dashboard
+            // Affiche la vue par défaut sur le Tableau de bord
             CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
-            cardLayout.show(contentPanel, "Dashboard");
+            cardLayout.show(contentPanel, "Tableau de bord");
 
             return contentPanel;
         }

@@ -15,12 +15,7 @@ public interface UserDao extends BaseDao<User> {
 
     List<User> findByRole(Role role);
     Optional<User> findByEmailAndPassword(String email, String password);
-
-   
-
-
-
-  
-
+    // boolean updateSetting(User user) ;
+    boolean updateStudent(User use);
 }
 

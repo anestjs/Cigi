@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+
 public class ClassDaoImpl implements ClassDao {
 
     @Override
@@ -196,4 +199,22 @@ public boolean save(Class entity) {
         classEntity.setName(); // This will generate the name as "CIGI" + year
         return classEntity;
     }
+
+    @Override
+    public Year getClassYear(Integer class_id) {
+        String sql = "SELECT year FROM classes WHERE class_id = ?";
+        try (Connection conn = DatabaseConfig.connexion();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, class_id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Year.valueOf(rs.getString("year")); // Convert String to Year enum
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if no result is found
+    }
+
+
 }

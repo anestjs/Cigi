@@ -21,7 +21,7 @@ public class EditModuleDialog extends JDialog {
     private ClassDaoImpl classDao;
 
     public EditModuleDialog(JFrame parent, Module module) {
-        super(parent, "Edit Module", true);
+        super(parent, "Modifier le module", true);
         this.module = module;
         moduleDao = new ModuleDaoImpl();
         profDao = new ProfessorDaoImpl();
@@ -34,38 +34,38 @@ public class EditModuleDialog extends JDialog {
         setSize(400, 300);
         setLocationRelativeTo(null);
 
-        add(new JLabel("Name:"));
+        add(new JLabel("Nom :"));
         nameField = new JTextField(module.getName());
         add(nameField);
 
-        add(new JLabel("Semester:"));
+        add(new JLabel("Semestre :"));
         semesterComboBox = new JComboBox<>(Semester.values());
         semesterComboBox.setSelectedItem(module.getSemester());
         add(semesterComboBox);
 
-        // Add listener to update year when semester changes
+        // Ajouter un écouteur pour mettre à jour l'année lorsque le semestre change
         semesterComboBox.addActionListener(e -> updateYearBasedOnSemester());
 
-        add(new JLabel("Year:"));
+        add(new JLabel("Année :"));
         yearComboBox = new JComboBox<>(Year.values());
         yearComboBox.setSelectedItem(module.getYear());
         add(yearComboBox);
 
-        add(new JLabel("Professor:"));
+        add(new JLabel("Professeur :"));
         professorComboBox = new JComboBox<>(profDao.findAll().toArray(new Professor[0]));
         professorComboBox.setSelectedItem(module.getProfessor());
         add(professorComboBox);
 
-        add(new JLabel("Class:"));
+        add(new JLabel("Classe :"));
         classComboBox = new JComboBox<>(classDao.findAll().toArray(new Class[0]));
         classComboBox.setSelectedItem(module.getClassEntity());
         add(classComboBox);
 
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton("Enregistrer");
         saveButton.addActionListener(e -> saveModule());
         add(saveButton);
 
-        JButton cancelButton = new JButton("Cancel");
+        JButton cancelButton = new JButton("Annuler");
         cancelButton.addActionListener(e -> dispose());
         add(cancelButton);
     }
@@ -88,22 +88,22 @@ public class EditModuleDialog extends JDialog {
             case S6:
                 return Year._3;
             default:
-                throw new IllegalArgumentException("Invalid semester: " + semester);
+                throw new IllegalArgumentException("Semestre invalide : " + semester);
         }
     }
 
     private void saveModule() {
         module.setName(nameField.getText());
         module.setSemester((Semester) semesterComboBox.getSelectedItem());
-        module.setYear((Year) yearComboBox.getSelectedItem()); // Year is updated based on semester
+        module.setYear((Year) yearComboBox.getSelectedItem()); // L'année est mise à jour en fonction du semestre
         module.setProfessor((Professor) professorComboBox.getSelectedItem());
         module.setClassEntity((Class) classComboBox.getSelectedItem());
 
         if (moduleDao.update(module)) {
-            JOptionPane.showMessageDialog(this, "Module updated successfully!");
+            JOptionPane.showMessageDialog(this, "Module mis à jour avec succès !");
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Failed to update module.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Échec de la mise à jour du module.", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

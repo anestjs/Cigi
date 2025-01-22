@@ -5,6 +5,7 @@ import main.java.com.cigiproject.database.DatabaseConfig;
 import main.java.com.cigiproject.model.Class;
 import main.java.com.cigiproject.model.Enrollment;
 import main.java.com.cigiproject.model.Student;
+import main.java.com.cigiproject.model.Year;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,14 +13,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class EnrollmentDaoImpl implements EnrollmentDao {
-
+    private ClassDaoImpl classDaoImpl ; 
     @Override
     public boolean enrollStudent(Integer studentCne, Integer classId) {
-        String query = "INSERT INTO enrollments (student_cne, class_id) VALUES (?, ?)";
+        String query = "INSERT INTO enrollments (cne, class_id, year) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConfig.connexion();
              PreparedStatement stmt = conn.prepareStatement(query)) {
+            classDaoImpl = new ClassDaoImpl();
+            Year year = classDaoImpl.getClassYear(classId);
             stmt.setInt(1, studentCne);
             stmt.setInt(2, classId);
+            stmt.setString(3, year.name());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

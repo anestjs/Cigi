@@ -2,11 +2,7 @@ package main.java.com.cigiproject.ui.admin;
 
 import javax.swing.*;
 import java.awt.*;
-
- 
-import javax.swing.*;
 import javax.swing.table.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -15,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 import main.java.com.cigiproject.dao.impl.ModuleDaoImpl;
 import main.java.com.cigiproject.model.*;
 import main.java.com.cigiproject.model.Module;
- import java.util.List;
+import java.util.List;
 
 public class ModulesPanel extends JPanel {
     private static final Color UMI_BLUE = new Color(0, 127, 163);
@@ -43,9 +39,6 @@ public class ModulesPanel extends JPanel {
 
         JPanel tablePanel = createTablePanel();
         add(tablePanel, BorderLayout.CENTER);
-
-        // JPanel paginationPanel = createPaginationPanel();
-        // add(paginationPanel, BorderLayout.SOUTH);
     }
 
     private JPanel createHeaderPanel() {
@@ -54,7 +47,7 @@ public class ModulesPanel extends JPanel {
         headerPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
 
         // Title
-        JLabel titleLabel = new JLabel("Modules Management");
+        JLabel titleLabel = new JLabel("Gestion des Modules");
         titleLabel.setFont(TITLE_FONT);
         titleLabel.setForeground(UMI_BLUE);
         headerPanel.add(titleLabel, BorderLayout.WEST);
@@ -65,16 +58,10 @@ public class ModulesPanel extends JPanel {
 
         // Filters
         semesterFilter = new JComboBox<>(Semester.values());
-
-        // JTextField searchField = createStyledTextField("Search modules...");
-
         semesterFilter.addActionListener(e -> filterTable());
-
         
-        searchFilterPanel.add(new JLabel("Semester:"));
+        searchFilterPanel.add(new JLabel("Semestre:"));
         searchFilterPanel.add(semesterFilter);
- 
-        // searchFilterPanel.add(searchField);
 
         headerPanel.add(searchFilterPanel, BorderLayout.EAST);
 
@@ -90,7 +77,7 @@ public class ModulesPanel extends JPanel {
         tablePanel.add(crudPanel, BorderLayout.NORTH);
 
         // Create table
-        String[] columnNames = {"ID", "Name", "Semester", "Year", "Professor", "Class"};
+        String[] columnNames = {"ID", "Nom", "Semestre", "Année", "Professeur", "Classe"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -134,11 +121,11 @@ public class ModulesPanel extends JPanel {
         if (selectedModule != null) {
             String details = String.format("""
                 ID: %d
-                Name: %s
-                Semester: %s
-                Year: %s
-                Professor: %s %s
-                Class: %s
+                Nom: %s
+                Semestre: %s
+                Année: %s
+                Professeur: %s %s
+                Classe: %s
                 """,
                 selectedModule.getModule_id(),
                 selectedModule.getName(),
@@ -146,28 +133,26 @@ public class ModulesPanel extends JPanel {
                 selectedModule.getYear(),
                 selectedModule.getProfessor().getUser().getFirstname(),
                 selectedModule.getProfessor().getUser().getLastname(),
-                selectedModule.getClassEntity() != null ? selectedModule.getClassEntity().getName() : "Unassigned"
+                selectedModule.getClassEntity() != null ? selectedModule.getClassEntity().getName() : "Non assigné"
             );
 
-            JOptionPane.showMessageDialog(this, details, "Module Details", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, details, "Détails du Module", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-
 
     private JPanel createActionPanel() {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         actionPanel.setBackground(BACKGROUND_COLOR);
         actionPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
     
-        JButton addButton = createStyledButton("Add Module", UMI_BLUE);
-        JButton editButton = createStyledButton("Edit", UMI_ORANGE);
-        JButton deleteButton = createStyledButton("Delete", Color.RED);
+        JButton addButton = createStyledButton("Ajouter Module", UMI_BLUE);
+        JButton editButton = createStyledButton("Modifier", UMI_ORANGE);
+        JButton deleteButton = createStyledButton("Supprimer", Color.RED);
      
         addButton.addActionListener(e -> {
             AddModuleDialog addDialog = new AddModuleDialog((JFrame) SwingUtilities.getWindowAncestor(this));
             addDialog.setVisible(true);
-            populateTable(); // Refresh the table after adding a module
+            populateTable();
         });
     
         editButton.addActionListener(e -> {
@@ -182,24 +167,22 @@ public class ModulesPanel extends JPanel {
                 if (selectedModule != null) {
                     EditModuleDialog editDialog = new EditModuleDialog((JFrame) SwingUtilities.getWindowAncestor(this), selectedModule);
                     editDialog.setVisible(true);
-                    populateTable(); // Refresh the table after editing a module
+                    populateTable();
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Please select a module to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Veuillez sélectionner un module à modifier.", "Aucune Sélection", JOptionPane.WARNING_MESSAGE);
             }
         });
     
-        // Add delete functionality
         deleteButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
             if (selectedRow != -1) {
                 int moduleId = (int) tableModel.getValueAt(selectedRow, 0);
     
-                // Confirm deletion with the user
                 int confirm = JOptionPane.showConfirmDialog(
                     this,
-                    "Are you sure you want to delete this module?",
-                    "Confirm Deletion",
+                    "Êtes-vous sûr de vouloir supprimer ce module ?",
+                    "Confirmer la Suppression",
                     JOptionPane.YES_NO_OPTION
                 );
     
@@ -208,14 +191,14 @@ public class ModulesPanel extends JPanel {
                     boolean isDeleted = moduleDao.delete(moduleId);
     
                     if (isDeleted) {
-                        JOptionPane.showMessageDialog(this, "Module deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        populateTable(); // Refresh the table after deletion
+                        JOptionPane.showMessageDialog(this, "Module supprimé avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                        populateTable();
                     } else {
-                        JOptionPane.showMessageDialog(this, "Failed to delete module.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Échec de la suppression du module.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Please select a module to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Veuillez sélectionner un module à supprimer.", "Aucune Sélection", JOptionPane.WARNING_MESSAGE);
             }
         });
     
@@ -226,45 +209,8 @@ public class ModulesPanel extends JPanel {
         return actionPanel;
     }
 
-   // private JPanel createPaginationPanel() {
-    //     JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-    //     paginationPanel.setBackground(BACKGROUND_COLOR);
-
-    //     JButton prevButton = createStyledButton("Previous", UMI_BLUE);
-    //     JButton nextButton = createStyledButton("Next", UMI_BLUE);
-    //     JLabel pageLabel = new JLabel("Page 1");
-    //     pageLabel.setFont(TABLE_FONT);
-
-    //     prevButton.setPreferredSize(new Dimension(80, 35));
-    //     nextButton.setPreferredSize(new Dimension(80, 35));
-
-    //     prevButton.addActionListener(e -> {
-    //         if (currentPage > 1) {
-    //             currentPage--;
-    //             updateTableData();
-    //             pageLabel.setText("Page " + currentPage);
-    //         }
-    //     });
-
-    //     nextButton.addActionListener(e -> {
-    //         int maxPages = (int) Math.ceil((double) allModules.size() / rowsPerPage);
-    //         if (currentPage < maxPages) {
-    //             currentPage++;
-    //             updateTableData();
-    //             pageLabel.setText("Page " + currentPage);
-    //         }
-    //     });
-
-    //     paginationPanel.add(prevButton);
-    //     paginationPanel.add(pageLabel);
-    //     paginationPanel.add(nextButton);
-
-    //     return paginationPanel;
-    // }
-
     private void filterTable() {
         Semester selectedSemester = (Semester) semesterFilter.getSelectedItem();
- 
         List<Module> filteredModules = allModules.stream()
                 .filter(module -> selectedSemester == null || module.getSemester() == selectedSemester)
                 .toList();
@@ -291,7 +237,7 @@ public class ModulesPanel extends JPanel {
                 String.format("%s %s", 
                     module.getProfessor().getUser().getFirstname(),
                     module.getProfessor().getUser().getLastname()),
-                module.getClassEntity() != null ? module.getClassEntity().getName() : "Unassigned"
+                module.getClassEntity() != null ? module.getClassEntity().getName() : "Non assigné"
             };
             tableModel.addRow(rowData);
         }
