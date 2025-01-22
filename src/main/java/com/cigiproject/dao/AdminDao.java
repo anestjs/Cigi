@@ -25,8 +25,7 @@ public interface AdminDao extends BaseDao<User> {
     Student getStudentByCne(Integer studentCne);
     List<Student> getAllStudents();
     List<Student> getStudentsByYear(Year year); 
-    void promoteStudentsToNextYear(); 
-
+ 
     // Class Management
     void createClass(Class newClass);
     void updateClass(Class updatedClass);

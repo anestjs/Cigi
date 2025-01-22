@@ -2,35 +2,35 @@ package main.java.com.cigiproject.ui.admin;
 
 import javax.swing.*;
 import java.awt.*;
-import javax.swing.border.*;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.border.EmptyBorder;
 import main.java.com.cigiproject.model.*;
-import main.java.com.cigiproject.model.Class;
-import main.java.com.cigiproject.model.Module;
-import main.java.com.cigiproject.dao.impl.ClassDaoImpl;
-import main.java.com.cigiproject.dao.impl.ModuleDaoImpl;
-import main.java.com.cigiproject.dao.impl.ProfessorDaoImpl;
+import main.java.com.cigiproject.dao.impl.EnrollmentDaoImpl;
+import main.java.com.cigiproject.dao.impl.StudentDaoImpl;
+import main.java.com.cigiproject.dao.impl.UserDaoImpl;
 
-public class AddModuleDialog extends JDialog {
+public class AddStudentDialog extends JDialog {
     private static final Color UMI_BLUE = new Color(0, 127, 163);
     private static final Color UMI_ORANGE = new Color(255, 140, 0);
     private static final Color BACKGROUND_COLOR = Color.WHITE;
     private static final Font LABEL_FONT = new Font("Arial", Font.BOLD, 14);
     private static final Font INPUT_FONT = new Font("Arial", Font.PLAIN, 14);
 
-    private JTextField nameField;
-    private JComboBox<Semester> semesterComboBox;
-    private JComboBox<Professor> professorComboBox;
-    private JComboBox<Class> classComboBox;
-    private ModuleDaoImpl moduleDao;
-    private ProfessorDaoImpl profDao;
-    private ClassDaoImpl classDao;
+    private JTextField firstNameField;
+    private JTextField lastNameField;
+    private JTextField emailField;
+    private JPasswordField passwordField;
+    private StudentDaoImpl studentDao;
+    private UserDaoImpl userDao;
+    private EnrollmentDaoImpl enrollmentDao;
+    private int classId;
 
-    public AddModuleDialog(JFrame parent) {
-        super(parent, "Add Module", true);
-        moduleDao = new ModuleDaoImpl();
-        profDao = new ProfessorDaoImpl();
-        classDao = new ClassDaoImpl();
+    public AddStudentDialog(JFrame parent, int classId) {
+        super(parent, "Add Student", true);
+        this.classId = classId;
+        studentDao = new StudentDaoImpl();
+        userDao = new UserDaoImpl();
+        enrollmentDao = new EnrollmentDaoImpl();
         initializeUI();
     }
 
@@ -47,20 +47,27 @@ public class AddModuleDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Name Field
-        addFormRow(formPanel, "Name:", createStyledTextField(), 0, gbc);
+        // First Name Field
+        firstNameField = createStyledTextField();
+        addFormRow(formPanel, "First Name:", firstNameField, 0, gbc);
 
-        // Semester Combo
-        semesterComboBox = createStyledComboBox(Semester.values());
-        addFormRow(formPanel, "Semester:", semesterComboBox, 1, gbc);
+        // Last Name Field
+        lastNameField = createStyledTextField();
+        addFormRow(formPanel, "Last Name:", lastNameField, 1, gbc);
 
-        // Professor Combo
-        professorComboBox = createStyledComboBox(profDao.findAll().toArray(new Professor[0]));
-        addFormRow(formPanel, "Professor:", professorComboBox, 2, gbc);
+        // Email Field
+        emailField = createStyledTextField();
+        addFormRow(formPanel, "Email:", emailField, 2, gbc);
 
-        // Class Combo
-        classComboBox = createStyledComboBox(classDao.findAll().toArray(new Class[0]));
-        addFormRow(formPanel, "Class:", classComboBox, 3, gbc);
+        // Password Field
+        passwordField = new JPasswordField();
+        passwordField.setFont(INPUT_FONT);
+        passwordField.setPreferredSize(new Dimension(200, 35));
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(UMI_BLUE),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        addFormRow(formPanel, "Password:", passwordField, 3, gbc);
 
         mainPanel.add(formPanel);
         mainPanel.add(Box.createVerticalStrut(20));
@@ -72,7 +79,7 @@ public class AddModuleDialog extends JDialog {
         JButton saveButton = createStyledButton("Save", UMI_BLUE);
         JButton cancelButton = createStyledButton("Cancel", Color.GRAY);
 
-        saveButton.addActionListener(e -> saveModule());
+        saveButton.addActionListener(e -> saveStudent());
         cancelButton.addActionListener(e -> dispose());
 
         buttonPanel.add(cancelButton);
@@ -103,23 +110,14 @@ public class AddModuleDialog extends JDialog {
     }
 
     private JTextField createStyledTextField() {
-        nameField = new JTextField();
-        nameField.setFont(INPUT_FONT);
-        nameField.setPreferredSize(new Dimension(200, 35));
-        nameField.setBorder(BorderFactory.createCompoundBorder(
+        JTextField textField = new JTextField();
+        textField.setFont(INPUT_FONT);
+        textField.setPreferredSize(new Dimension(200, 35));
+        textField.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(UMI_BLUE),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
-        return nameField;
-    }
-
-    private <T> JComboBox<T> createStyledComboBox(T[] items) {
-        JComboBox<T> comboBox = new JComboBox<>(items);
-        comboBox.setFont(INPUT_FONT);
-        comboBox.setPreferredSize(new Dimension(200, 35));
-        comboBox.setBorder(BorderFactory.createLineBorder(UMI_BLUE));
-        comboBox.setBackground(BACKGROUND_COLOR);
-        return comboBox;
+        return textField;
     }
 
     private JButton createStyledButton(String text, Color color) {
@@ -160,45 +158,51 @@ public class AddModuleDialog extends JDialog {
         return button;
     }
 
-    private void saveModule() {
-        String name = nameField.getText();
-        if (name.trim().isEmpty()) {
-            showStyledMessage("Please enter a module name", "Validation Error", JOptionPane.ERROR_MESSAGE);
+    private void saveStudent() {
+        String firstName = firstNameField.getText().trim();
+        String lastName = lastNameField.getText().trim();
+        String email = emailField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        // Validate input fields
+        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            showStyledMessage("Please fill in all fields.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Determine the year based on the selected semester
-        Semester semester = (Semester) semesterComboBox.getSelectedItem();
-        Year year = determineYearFromSemester(semester);
+        // Create a new User object
+        User user = new User();
+        user.setFirstname(firstName);
+        user.setLastname(lastName);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setRole(Role.Student); // Set role to STUDENT by default
 
-        Module module = new Module();
-        module.setName(name);
-        module.setSemester(semester);
-        module.setYear(year); // Set the year programmatically
-        module.setProfessor((Professor) professorComboBox.getSelectedItem());
-        module.setClassEntity((Class) classComboBox.getSelectedItem());
+        // Save the User
+        boolean isUserSaved = userDao.save(user);
+        if (!isUserSaved) {
+            showStyledMessage("Failed to save user.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        if (moduleDao.save(module)) {
-            showStyledMessage("Module added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        // Create a new Student object
+        Student student = new Student();
+        student.setUser(user);
+
+        // Save the Student
+        boolean isStudentSaved = studentDao.save(student);
+        if (!isStudentSaved) {
+            showStyledMessage("Failed to save student.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Enroll the Student in the selected class
+        boolean isEnrolled = enrollmentDao.enrollStudent(student.getCne(), classId);
+        if (isEnrolled) {
+            showStyledMessage("Student added and enrolled successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            showStyledMessage("Failed to add module", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private Year determineYearFromSemester(Semester semester) {
-        switch (semester) {
-            case S1:
-            case S2:
-                return Year._1;
-            case S3:
-            case S4:
-                return Year._2;
-            case S5:
-            case S6:
-                return Year._3;
-            default:
-                throw new IllegalArgumentException("Invalid semester: " + semester);
+            showStyledMessage("Failed to enroll student.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
