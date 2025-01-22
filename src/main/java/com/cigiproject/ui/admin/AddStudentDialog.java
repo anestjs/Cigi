@@ -17,6 +17,7 @@ public class AddStudentDialog extends JDialog {
     private static final Font INPUT_FONT = new Font("Arial", Font.PLAIN, 14);
 
     private JTextField firstNameField;
+    private JTextField cneField;
     private JTextField lastNameField;
     private JTextField emailField;
     private JPasswordField passwordField;
@@ -26,7 +27,7 @@ public class AddStudentDialog extends JDialog {
     private int classId;
 
     public AddStudentDialog(JFrame parent, int classId) {
-        super(parent, "Add Student", true);
+        super(parent, "Ajouter un étudiant", true);
         this.classId = classId;
         studentDao = new StudentDaoImpl();
         userDao = new UserDaoImpl();
@@ -47,17 +48,20 @@ public class AddStudentDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
+        cneField = createStyledTextField();
+        addFormRow(formPanel, "CNE:", cneField, 0, gbc);
+
         // First Name Field
         firstNameField = createStyledTextField();
-        addFormRow(formPanel, "First Name:", firstNameField, 0, gbc);
+        addFormRow(formPanel, "Prénom:", firstNameField, 1, gbc);
 
         // Last Name Field
         lastNameField = createStyledTextField();
-        addFormRow(formPanel, "Last Name:", lastNameField, 1, gbc);
+        addFormRow(formPanel, "Nom de famille:", lastNameField, 2, gbc);
 
         // Email Field
         emailField = createStyledTextField();
-        addFormRow(formPanel, "Email:", emailField, 2, gbc);
+        addFormRow(formPanel, "Email:", emailField, 3, gbc);
 
         // Password Field
         passwordField = new JPasswordField();
@@ -67,7 +71,7 @@ public class AddStudentDialog extends JDialog {
             BorderFactory.createLineBorder(UMI_BLUE),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
-        addFormRow(formPanel, "Password:", passwordField, 3, gbc);
+        addFormRow(formPanel, "Mot de passe:", passwordField, 4, gbc);
 
         mainPanel.add(formPanel);
         mainPanel.add(Box.createVerticalStrut(20));
@@ -76,8 +80,8 @@ public class AddStudentDialog extends JDialog {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(BACKGROUND_COLOR);
 
-        JButton saveButton = createStyledButton("Save", UMI_BLUE);
-        JButton cancelButton = createStyledButton("Cancel", Color.GRAY);
+        JButton saveButton = createStyledButton("Enregistrer", UMI_BLUE);
+        JButton cancelButton = createStyledButton("Annuler", Color.GRAY);
 
         saveButton.addActionListener(e -> saveStudent());
         cancelButton.addActionListener(e -> dispose());
@@ -160,13 +164,13 @@ public class AddStudentDialog extends JDialog {
 
     private void saveStudent() {
         String firstName = firstNameField.getText().trim();
+        int cne = Integer.parseInt(cneField.getText());
         String lastName = lastNameField.getText().trim();
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 
-        // Validate input fields
-        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            showStyledMessage("Please fill in all fields.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || cne == 0) {
+            showStyledMessage("Veuillez remplir tous les champs.", "Erreur de validation", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -176,33 +180,27 @@ public class AddStudentDialog extends JDialog {
         user.setLastname(lastName);
         user.setEmail(email);
         user.setPassword(password);
-        user.setRole(Role.Student); // Set role to STUDENT by default
-
-        // Save the User
-        boolean isUserSaved = userDao.save(user);
-        if (!isUserSaved) {
-            showStyledMessage("Failed to save user.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        user.setRole(Role.Student); 
 
         // Create a new Student object
         Student student = new Student();
+        student.setCne(cne);
         student.setUser(user);
 
         // Save the Student
         boolean isStudentSaved = studentDao.save(student);
         if (!isStudentSaved) {
-            showStyledMessage("Failed to save student.", "Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Échec de l'enregistrement de l'étudiant.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Enroll the Student in the selected class
         boolean isEnrolled = enrollmentDao.enrollStudent(student.getCne(), classId);
         if (isEnrolled) {
-            showStyledMessage("Student added and enrolled successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showStyledMessage("Étudiant ajouté et inscrit avec succès!", "Succès", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            showStyledMessage("Failed to enroll student.", "Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Échec de l'inscription de l'étudiant.", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 

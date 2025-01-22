@@ -5,6 +5,8 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.border.EmptyBorder;
+
+import main.java.com.cigiproject.dao.impl.ProfessorDaoImpl;
 import main.java.com.cigiproject.model.Professor;
 import main.java.com.cigiproject.model.User;
 import main.java.com.cigiproject.services.ProfessorService;
@@ -20,7 +22,6 @@ import java.awt.event.*;
 import javax.swing.border.EmptyBorder;
 import main.java.com.cigiproject.model.Professor;
 import main.java.com.cigiproject.model.User;
-import main.java.com.cigiproject.services.ProfessorService;
 import java.util.List;
 
 public class ProfPanel extends JPanel {
@@ -76,14 +77,14 @@ public class ProfPanel extends JPanel {
         headerPanel.setBackground(BACKGROUND_COLOR);
         headerPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        JLabel titleLabel = new JLabel("Professors Management");
+        JLabel titleLabel = new JLabel("Gestion des Professeurs");
         titleLabel.setFont(TITLE_FONT);
         titleLabel.setForeground(UMI_BLUE);
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         searchPanel.setBackground(BACKGROUND_COLOR);
-        JTextField searchField = createStyledTextField("Search professors...");
+        JTextField searchField = createStyledTextField("Rechercher des professeurs...");
         searchPanel.add(searchField);
         headerPanel.add(searchPanel, BorderLayout.EAST);
 
@@ -94,12 +95,12 @@ public class ProfPanel extends JPanel {
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBackground(BACKGROUND_COLOR);
 
-        // Add CRUD buttons on top of the table
+        // Ajouter des boutons CRUD au-dessus du tableau
         JPanel crudPanel = createActionPanel();
         tablePanel.add(crudPanel, BorderLayout.NORTH);
 
-        // Create the table
-        String[] columnNames = {"ID", "First Name", "Last Name", "Email", "Role"};
+        // Créer le tableau
+        String[] columnNames = {"ID", "Prénom", "Nom", "Email", "Rôle"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -110,13 +111,13 @@ public class ProfPanel extends JPanel {
         table = new JTable(tableModel);
         styleTable(table);
 
-        // Add double-click listener to the table
+        // Ajouter un écouteur de double-clic au tableau
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Detect double-click
+                if (e.getClickCount() == 2) { // Détecter un double-clic
                     int selectedRow = table.getSelectedRow();
-                    if (selectedRow != -1) { // Ensure a row is selected
+                    if (selectedRow != -1) { // Assurer qu'une ligne est sélectionnée
                         showProfessorDetails(selectedRow);
                     }
                 }
@@ -134,44 +135,92 @@ public class ProfPanel extends JPanel {
     }
 
     private void showProfessorDetails(int selectedRow) {
-        // Get the professor ID from the selected row
+        // Obtenir l'ID du professeur depuis la ligne sélectionnée
         int professorId = (int) tableModel.getValueAt(selectedRow, 0);
 
-        // Find the professor in the list
+        // Trouver le professeur dans la liste
         Professor selectedProfessor = allProfessors.stream()
                 .filter(prof -> prof.getProfessor_id() == professorId)
                 .findFirst()
                 .orElse(null);
 
         if (selectedProfessor != null) {
-            // Display detailed information in a dialog
+            // Afficher les informations détaillées dans une boîte de dialogue
             User user = selectedProfessor.getUser();
             String details = "ID: " + selectedProfessor.getProfessor_id() + "\n" +
-                    "First Name: " + user.getFirstname() + "\n" +
-                    "Last Name: " + user.getLastname() + "\n" +
+                    "Prénom: " + user.getFirstname() + "\n" +
+                    "Nom: " + user.getLastname() + "\n" +
                     "Email: " + user.getEmail() + "\n" +
-                    "Role: " + user.getRole().name();
+                    "Rôle: " + user.getRole().name();
 
-            JOptionPane.showMessageDialog(this, details, "Professor Details", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, details, "Détails du professeur", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     private JPanel createActionPanel() {
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Align buttons to the left
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Aligner les boutons à gauche
         actionPanel.setBackground(BACKGROUND_COLOR);
-        actionPanel.setBorder(new EmptyBorder(0, 0, 10, 0)); // Add some padding below the buttons
+        actionPanel.setBorder(new EmptyBorder(0, 0, 10, 0)); // Ajouter un peu d'espace sous les boutons
 
-        JButton addButton = createStyledButton("Add Professor", UMI_BLUE);
-        JButton editButton = createStyledButton("Edit", UMI_ORANGE);
-        JButton deleteButton = createStyledButton("Delete", Color.RED);
+        JButton addButton = createStyledButton("Ajouter un professeur", UMI_BLUE);
+        JButton editButton = createStyledButton("Modifier", UMI_ORANGE);
+        JButton deleteButton = createStyledButton("Supprimer", Color.RED);
 
         addButton.addActionListener(e -> {
             AddProfessorDialog dialog = new AddProfessorDialog((JFrame) SwingUtilities.getWindowAncestor(ProfPanel.this));
             dialog.setVisible(true);
-            // Refresh the table after adding a professor
+            // Rafraîchir le tableau après l'ajout d'un professeur
             populateTable(tableModel);
         });
+
+        editButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int professorId = (int) tableModel.getValueAt(selectedRow, 0);
+                Professor selectedProfessor = allProfessors.stream()
+                        .filter(prof -> prof.getProfessor_id() == professorId)
+                        .findFirst()
+                        .orElse(null);
+                if (selectedProfessor != null) {
+                    EditProfessorDialog dialog = new EditProfessorDialog((JFrame) SwingUtilities.getWindowAncestor(ProfPanel.this), selectedProfessor);
+                    dialog.setVisible(true);
+                    populateTable(tableModel); // Rafraîchir le tableau après modification
+                }
+            } else {
+                JOptionPane.showMessageDialog(ProfPanel.this, "Veuillez sélectionner un professeur à modifier.", "Avertissement", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        deleteButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int professorId = (int) tableModel.getValueAt(selectedRow, 0);
         
+                // Confirmer avant la suppression
+                int confirm = JOptionPane.showConfirmDialog(ProfPanel.this, 
+                    "Êtes-vous sûr de vouloir supprimer ce professeur ?\nSes modules seront réaffectés à un autre professeur.", 
+                    "Confirmer la suppression", 
+                    JOptionPane.YES_NO_OPTION);
+        
+                if (confirm == JOptionPane.YES_OPTION) {
+                    ProfessorDaoImpl professorDaoImpl = new ProfessorDaoImpl();
+                    boolean deleted = professorDaoImpl.delete(professorId);
+                    if (!deleted) {
+                        JOptionPane.showMessageDialog(ProfPanel.this, 
+                            "Erreur lors de la suppression du professeur.", 
+                            "Erreur", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    populateTable(tableModel); // Rafraîchir le tableau
+                }
+            } else {
+                JOptionPane.showMessageDialog(ProfPanel.this, 
+                    "Veuillez sélectionner un professeur à supprimer.", 
+                    "Avertissement", 
+                    JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
         actionPanel.add(addButton);
         actionPanel.add(editButton);
         actionPanel.add(deleteButton);
@@ -218,11 +267,11 @@ public class ProfPanel extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Paint rounded background
+                // Peindre l'arrière-plan arrondi
                 g2.setColor(getBackground());
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 15, 15));
 
-                // Paint text
+                // Peindre le texte
                 g2.setColor(getForeground());
                 FontMetrics fm = g2.getFontMetrics();
                 Rectangle2D r = fm.getStringBounds(text, g2);
@@ -235,7 +284,7 @@ public class ProfPanel extends JPanel {
             @Override
             public void updateUI() {
                 super.updateUI();
-                setContentAreaFilled(false); // Fix for gray rectangle on hover
+                setContentAreaFilled(false); // Correction pour le rectangle gris au survol
                 setBorderPainted(false);
             }
         };
@@ -245,7 +294,7 @@ public class ProfPanel extends JPanel {
         button.setBackground(color);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
-        button.setPreferredSize(new Dimension(120, 35)); // Adjusted width for CRUD buttons
+        button.setPreferredSize(new Dimension(120, 35)); // Largeur ajustée pour les boutons CRUD
 
         button.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {

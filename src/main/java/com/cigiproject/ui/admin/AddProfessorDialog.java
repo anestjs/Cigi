@@ -23,7 +23,7 @@ public class AddProfessorDialog extends JDialog {
     private UserDaoImpl userDao;
 
     public AddProfessorDialog(JFrame parent) {
-        super(parent, "Add Professor", true);
+        super(parent, "Ajouter un professeur", true);
         professorDao = new ProfessorDaoImpl();
         userDao = new UserDaoImpl();
         initializeUI();
@@ -44,11 +44,11 @@ public class AddProfessorDialog extends JDialog {
 
         // First Name Field
         firstNameField = createStyledTextField();
-        addFormRow(formPanel, "First Name:", firstNameField, 0, gbc);
+        addFormRow(formPanel, "Prénom:", firstNameField, 0, gbc);
 
         // Last Name Field
         lastNameField = createStyledTextField();
-        addFormRow(formPanel, "Last Name:", lastNameField, 1, gbc);
+        addFormRow(formPanel, "Nom:", lastNameField, 1, gbc);
 
         // Email Field
         emailField = createStyledTextField();
@@ -62,7 +62,7 @@ public class AddProfessorDialog extends JDialog {
             BorderFactory.createLineBorder(UMI_BLUE),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
-        addFormRow(formPanel, "Password:", passwordField, 3, gbc);
+        addFormRow(formPanel, "Mot de passe:", passwordField, 3, gbc);
 
         mainPanel.add(formPanel);
         mainPanel.add(Box.createVerticalStrut(20));
@@ -71,8 +71,8 @@ public class AddProfessorDialog extends JDialog {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(BACKGROUND_COLOR);
 
-        JButton saveButton = createStyledButton("Save", UMI_BLUE);
-        JButton cancelButton = createStyledButton("Cancel", Color.GRAY);
+        JButton saveButton = createStyledButton("Enregistrer", UMI_BLUE);
+        JButton cancelButton = createStyledButton("Annuler", Color.GRAY);
 
         saveButton.addActionListener(e -> saveProfessor());
         cancelButton.addActionListener(e -> dispose());
@@ -161,7 +161,7 @@ public class AddProfessorDialog extends JDialog {
 
         // Validate input fields
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            showStyledMessage("Please fill in all fields.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Veuillez remplir tous les champs.", "Erreur de validation", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -176,7 +176,7 @@ public class AddProfessorDialog extends JDialog {
         // Save the User
         boolean isUserSaved = userDao.save(user);
         if (!isUserSaved) {
-            showStyledMessage("Failed to save user.", "Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Échec de l'enregistrement de l'utilisateur.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -187,10 +187,10 @@ public class AddProfessorDialog extends JDialog {
         // Save the Professor
         boolean isProfessorSaved = professorDao.save(professor);
         if (isProfessorSaved) {
-            showStyledMessage("Professor added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showStyledMessage("Professeur ajouté avec succès !", "Succès", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            showStyledMessage("Failed to save professor.", "Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Échec de l'enregistrement du professeur.", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 

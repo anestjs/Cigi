@@ -7,6 +7,8 @@ import main.java.com.cigiproject.database.DatabaseConfig;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.JOptionPane;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -135,71 +137,133 @@ public class ProfessorDaoImpl implements ProfessorDao {
         }
     }
 
+
     @Override
-    public boolean delete(Integer professorId) {
-        Connection conn = null;
-        try {
-            conn = DatabaseConfig.connexion();
-            conn.setAutoCommit(false); // Start transaction
+public boolean delete(Integer professorId) {
+    Connection conn = null;
+    try {
+        conn = DatabaseConfig.connexion();
+        conn.setAutoCommit(false); // Start transaction
 
-            // First, get the user_id of the professor
-            String getUserSql = "SELECT user_id FROM professors WHERE professor_id = ?";
-            int userId = -1;
-            try (PreparedStatement getUserStmt = conn.prepareStatement(getUserSql)) {
-                getUserStmt.setInt(1, professorId);
-                ResultSet rs = getUserStmt.executeQuery();
-                if (rs.next()) {
-                    userId = rs.getInt("user_id");
-                } else {
-                    conn.rollback(); // Rollback if professor doesn't exist
-                    return false;
-                }
+        // Get the user_id of the professor
+        String getUserSql = "SELECT user_id FROM professors WHERE professor_id = ?";
+        int userId = -1;
+        try (PreparedStatement getUserStmt = conn.prepareStatement(getUserSql)) {
+            getUserStmt.setInt(1, professorId);
+            ResultSet rs = getUserStmt.executeQuery();
+            if (!rs.next()) {
+                return false; // Professor not found
             }
+            userId = rs.getInt("user_id");
+        }
 
-            // Now, delete the Professor
-            String professorSql = "DELETE FROM professors WHERE professor_id = ?";
-            try (PreparedStatement professorStmt = conn.prepareStatement(professorSql)) {
-                professorStmt.setInt(1, professorId);
-                int professorRowsDeleted = professorStmt.executeUpdate();
-                if (professorRowsDeleted == 0) {
-                    conn.rollback(); // Rollback if Professor couldn't be deleted
-                    return false;
-                }
-            }
-
-            // Finally, delete the User using UserDao
-            UserDao userDao = new UserDaoImpl(); // Assuming UserDaoImpl exists
-            boolean isUserDeleted = userDao.delete(userId);
-
-            if (isUserDeleted) {
-                conn.commit(); // Commit the transaction
-                return true;
-            } else {
-                conn.rollback(); // Rollback if User couldn't be deleted
-                return false;
-            }
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback on exception
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true); // Reset auto-commit
-                    conn.close(); // Close the connection
-                } catch (SQLException e) {
-                    e.printStackTrace();
+        // Find modules assigned to this professor
+        String findModulesSql = "SELECT module_id, name FROM modules WHERE professor_id = ?";
+        StringBuilder reassignmentMessage = new StringBuilder();
+        try (PreparedStatement findModulesStmt = conn.prepareStatement(findModulesSql)) {
+            findModulesStmt.setInt(1, professorId);
+            ResultSet rs = findModulesStmt.executeQuery();
+            
+            if (rs.next()) {
+                // Find another available professor
+                String findProfSql = "SELECT p.professor_id, u.firstname, u.lastname FROM professors p " +
+                                   "JOIN users u ON p.user_id = u.user_id " +
+                                   "WHERE p.professor_id != ? " +
+                                   "ORDER BY RAND() LIMIT 1";
+                
+                try (PreparedStatement findProfStmt = conn.prepareStatement(findProfSql)) {
+                    findProfStmt.setInt(1, professorId);
+                    ResultSet profRs = findProfStmt.executeQuery();
+                    
+                    if (profRs.next()) {
+                        int newProfId = profRs.getInt("professor_id");
+                        String newProfName = profRs.getString("firstname") + " " + profRs.getString("lastname");
+                        
+                        // Update all modules to the new professor
+                        String updateModulesSql = "UPDATE modules SET professor_id = ? WHERE professor_id = ?";
+                        try (PreparedStatement updateModulesStmt = conn.prepareStatement(updateModulesSql)) {
+                            updateModulesStmt.setInt(1, newProfId);
+                            updateModulesStmt.setInt(2, professorId);
+                            updateModulesStmt.executeUpdate();
+                        }
+                        
+                        // Build reassignment message
+                        do {
+                            reassignmentMessage.append("Module '")
+                                             .append(rs.getString("name"))
+                                             .append("' reassigned to ")
+                                             .append(newProfName)
+                                             .append("\n");
+                        } while (rs.next());
+                    } else {
+                        conn.rollback();
+                        JOptionPane.showMessageDialog(null, 
+                            "Cannot delete professor - no other professors available for module reassignment.", 
+                            "Error", 
+                            JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
                 }
             }
         }
-    }
 
+        // Delete the professor from the professors table
+        String professorSql = "DELETE FROM professors WHERE professor_id = ?";
+        try (PreparedStatement professorStmt = conn.prepareStatement(professorSql)) {
+            professorStmt.setInt(1, professorId);
+            int rowsDeleted = professorStmt.executeUpdate();
+            if (rowsDeleted == 0) {
+                conn.rollback();
+                return false;
+            }
+        }
+
+        // Delete the associated user from the users table
+        String userSql = "DELETE FROM users WHERE user_id = ?";
+        try (PreparedStatement userStmt = conn.prepareStatement(userSql)) {
+            userStmt.setInt(1, userId);
+            int rowsDeleted = userStmt.executeUpdate();
+            if (rowsDeleted == 0) {
+                conn.rollback();
+                return false;
+            }
+        }
+
+        conn.commit();
+        
+        // Show reassignment message if any modules were reassigned
+        if (reassignmentMessage.length() > 0) {
+            JOptionPane.showMessageDialog(null, 
+                "Professor deleted successfully.\n\nModule reassignments:\n" + reassignmentMessage.toString(),
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        return true;
+
+    } catch (SQLException e) {
+        try {
+            if (conn != null) {
+                conn.rollback();
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        e.printStackTrace();
+        return false;
+    } finally {
+        try {
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+   
+   
     @Override
     public List<Module> getAssignedModules(Integer professorId) {
         List<Module> modules = new ArrayList<>();

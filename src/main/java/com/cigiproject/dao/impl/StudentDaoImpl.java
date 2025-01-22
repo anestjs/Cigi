@@ -124,7 +124,7 @@ public class StudentDaoImpl implements StudentDao {
 
     @Override
     public boolean delete(Integer id) {
-        String sql = "DELETE FROM users WHERE user_id = (SELECT user_id FROM students WHERE student_id = ?)";
+        String sql = "DELETE FROM users WHERE user_id = (SELECT user_id FROM students WHERE cne = ?)";
         try (Connection conn = DatabaseConfig.connexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);

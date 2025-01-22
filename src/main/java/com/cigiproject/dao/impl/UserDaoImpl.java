@@ -152,6 +152,28 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public boolean updateStudent(User user) {
+        String sql = "UPDATE users SET firstname = ?, lastname = ?, email = ?, role = ? WHERE user_id = ?";
+        
+        try {
+            this.conn = DatabaseConfig.connexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, user.getFirstname());
+            stmt.setString(2, user.getLastname());
+            stmt.setString(3, user.getEmail());
+            // stmt.setString(4, user.getPassword());
+            stmt.setString(4, user.getRole().name());
+            stmt.setInt(5, user.getUser_id());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public boolean delete(Integer id) {
         String sql = "DELETE FROM users WHERE user_id = ?";
         

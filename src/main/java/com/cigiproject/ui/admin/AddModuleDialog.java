@@ -27,7 +27,7 @@ public class AddModuleDialog extends JDialog {
     private ClassDaoImpl classDao;
 
     public AddModuleDialog(JFrame parent) {
-        super(parent, "Add Module", true);
+        super(parent, "Ajouter un module", true);
         moduleDao = new ModuleDaoImpl();
         profDao = new ProfessorDaoImpl();
         classDao = new ClassDaoImpl();
@@ -40,37 +40,37 @@ public class AddModuleDialog extends JDialog {
         mainPanel.setBackground(BACKGROUND_COLOR);
         mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Form Panel
+        // Panel du formulaire
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(BACKGROUND_COLOR);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Name Field
-        addFormRow(formPanel, "Name:", createStyledTextField(), 0, gbc);
+        // Champ du nom
+        addFormRow(formPanel, "Nom :", createStyledTextField(), 0, gbc);
 
-        // Semester Combo
+        // Combo des semestres
         semesterComboBox = createStyledComboBox(Semester.values());
-        addFormRow(formPanel, "Semester:", semesterComboBox, 1, gbc);
+        addFormRow(formPanel, "Semestre :", semesterComboBox, 1, gbc);
 
-        // Professor Combo
+        // Combo des professeurs
         professorComboBox = createStyledComboBox(profDao.findAll().toArray(new Professor[0]));
-        addFormRow(formPanel, "Professor:", professorComboBox, 2, gbc);
+        addFormRow(formPanel, "Professeur :", professorComboBox, 2, gbc);
 
-        // Class Combo
+        // Combo des classes
         classComboBox = createStyledComboBox(classDao.findAll().toArray(new Class[0]));
-        addFormRow(formPanel, "Class:", classComboBox, 3, gbc);
+        addFormRow(formPanel, "Classe :", classComboBox, 3, gbc);
 
         mainPanel.add(formPanel);
         mainPanel.add(Box.createVerticalStrut(20));
 
-        // Buttons Panel
+        // Panel des boutons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(BACKGROUND_COLOR);
 
-        JButton saveButton = createStyledButton("Save", UMI_BLUE);
-        JButton cancelButton = createStyledButton("Cancel", Color.GRAY);
+        JButton saveButton = createStyledButton("Enregistrer", UMI_BLUE);
+        JButton cancelButton = createStyledButton("Annuler", Color.GRAY);
 
         saveButton.addActionListener(e -> saveModule());
         cancelButton.addActionListener(e -> dispose());
@@ -96,7 +96,7 @@ public class AddModuleDialog extends JDialog {
         label.setForeground(UMI_BLUE);
         panel.add(label, gbc);
 
-        // Component
+        // Composant
         gbc.gridx = 1;
         gbc.weightx = 0.9;
         panel.add(component, gbc);
@@ -163,26 +163,26 @@ public class AddModuleDialog extends JDialog {
     private void saveModule() {
         String name = nameField.getText();
         if (name.trim().isEmpty()) {
-            showStyledMessage("Please enter a module name", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Veuillez entrer un nom de module", "Erreur de validation", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Determine the year based on the selected semester
+        // Déterminer l'année en fonction du semestre sélectionné
         Semester semester = (Semester) semesterComboBox.getSelectedItem();
         Year year = determineYearFromSemester(semester);
 
         Module module = new Module();
         module.setName(name);
         module.setSemester(semester);
-        module.setYear(year); // Set the year programmatically
+        module.setYear(year); // Définir l'année de manière programmatique
         module.setProfessor((Professor) professorComboBox.getSelectedItem());
         module.setClassEntity((Class) classComboBox.getSelectedItem());
 
         if (moduleDao.save(module)) {
-            showStyledMessage("Module added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            showStyledMessage("Module ajouté avec succès!", "Succès", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            showStyledMessage("Failed to add module", "Error", JOptionPane.ERROR_MESSAGE);
+            showStyledMessage("Échec de l'ajout du module", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -198,7 +198,7 @@ public class AddModuleDialog extends JDialog {
             case S6:
                 return Year._3;
             default:
-                throw new IllegalArgumentException("Invalid semester: " + semester);
+                throw new IllegalArgumentException("Semestre invalide : " + semester);
         }
     }
 
