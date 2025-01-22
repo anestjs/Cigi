@@ -79,12 +79,6 @@ public class ProfessorDaoImpl implements ProfessorDao {
     @Override
     public boolean save(Professor professor) {
         // First, save the User
-        UserDao userDao = new UserDaoImpl(); // Assuming you have a UserDaoImpl class
-        boolean isUserSaved = userDao.save(professor.getUser());
-
-        if (!isUserSaved) {
-            return false; // If the User couldn't be saved, return false
-        }
 
         // Now, save the Professor with the generated user_id
         String sql = "INSERT INTO professors (user_id) VALUES (?)";

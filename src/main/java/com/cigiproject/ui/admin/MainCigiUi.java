@@ -85,16 +85,16 @@ public class MainCigiUi {
             sideBar.setLayout(new BoxLayout(sideBar, BoxLayout.Y_AXIS));
             sideBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            JLabel menuTitle = new JLabel("Dashboard de l'ADMIN", SwingConstants.CENTER);
-            menuTitle.setFont(new Font("SansSerif", Font.BOLD, 17));
+            JLabel menuTitle = new JLabel("Dashboard du directeur", SwingConstants.CENTER);
+            menuTitle.setFont(new Font("SansSerif", Font.BOLD, 15));
             menuTitle.setForeground(Color.WHITE);
             menuTitle.setBorder(new EmptyBorder(20, 12, 20, 10));
 
-            String[] menuItems = {"Dashboard", "Étudiants", "Gestion des Notes", "Gestion des Modules", "Professeurs", "Statistiques", "Settings", "Se Déconnecter"};
+            String[] menuItems = {"Dashboard", "Étudiants", "Gestion des Modules", "Professeurs", "Statistiques", "Settings", "Se Déconnecter"};
             String[] iconPaths = {
                 "../../../../../resources/icons/student.png",
                 "../../../../../resources/icons/student.png",
-                "../../../../../resources/icons/notes.png",
+                // "../../../../../resources/icons/notes.png",
                 "../../../../../resources/icons/modules.png",
                 "../../../../../resources/icons/teacher.png",
                 "../../../../../resources/icons/stats.png",

@@ -6,7 +6,8 @@ import main.java.com.cigiproject.dao.ClassDao;
 import main.java.com.cigiproject.database.DatabaseConfig;
 import main.java.com.cigiproject.model.Class;
 import main.java.com.cigiproject.model.Module;
- import main.java.com.cigiproject.model.Student;
+import main.java.com.cigiproject.model.Role;
+import main.java.com.cigiproject.model.Student;
  import main.java.com.cigiproject.model.User;
 import main.java.com.cigiproject.model.Year;
 
@@ -34,7 +35,7 @@ public class ClassDaoImpl implements ClassDao {
     }
 
     @Override
-    public List<Class> findAll() {
+    public List<Class> findAll() { 
         List<Class> classes = new ArrayList<>();
         String sql = "SELECT * FROM classes";
         try (Connection conn = DatabaseConfig.connexion();
@@ -95,36 +96,49 @@ public boolean save(Class entity) {
         }
     }
 
+   
     @Override
     public List<Student> getEnrolledStudents(Integer classId) {
         List<Student> students = new ArrayList<>();
-        String sql = "SELECT s.cne, s.year, u.user_id, u.firstname, u.lastname " +
-                    "FROM students s " +
+        String sql = "SELECT s.cne, u.user_id, u.firstname, u.lastname, u.email, u.role, e.year " +
+                    "FROM enrollments e " +
+                    "JOIN students s ON e.cne = s.cne " +
                     "JOIN users u ON s.user_id = u.user_id " +
-                    "WHERE s.class_id = ?";
+                    "WHERE e.class_id = ?";
+
         try (Connection conn = DatabaseConfig.connexion();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, classId);
             ResultSet rs = stmt.executeQuery();
+            
             while (rs.next()) {
                 // Create User object
                 User user = new User();
                 user.setUser_id(rs.getInt("user_id"));
                 user.setFirstname(rs.getString("firstname"));
                 user.setLastname(rs.getString("lastname"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(Role.valueOf(rs.getString("role"))); // Assuming Role is an enum
 
+                // Create Student object
                 Student student = new Student();
                 student.setCne(rs.getInt("cne"));
                 student.setUser(user);
-                student.setYear(Year.valueOf(rs.getString("year"))); // Assuming Year is an enum
+                
+                String yearStr = rs.getString("year");
+                if (yearStr != null) {
+                    student.setYear(Year.valueOf(yearStr)); // Convert safely
+                }
 
                 students.add(student);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return students;
     }
+
 
     @Override
     public List<Module> getClassModules(Integer classId) {

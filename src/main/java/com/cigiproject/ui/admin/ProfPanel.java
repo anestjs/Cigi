@@ -48,45 +48,8 @@ public class ProfPanel extends JPanel {
         JPanel tablePanel = createTablePanel();
         add(tablePanel, BorderLayout.CENTER);
 
-        JPanel paginationPanel = createPaginationPanel();
-        add(paginationPanel, BorderLayout.SOUTH);
-    }
-
-    private JPanel createPaginationPanel() {
-        JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        paginationPanel.setBackground(BACKGROUND_COLOR);
-
-        JButton prevButton = createStyledButton("Previous", UMI_BLUE);
-        JButton nextButton = createStyledButton("Next", UMI_BLUE);
-        JLabel pageLabel = new JLabel("Page 1");
-        pageLabel.setFont(TABLE_FONT);
-
-        // Set smaller width for pagination buttons
-        prevButton.setPreferredSize(new Dimension(80, 35)); // Smaller width
-        nextButton.setPreferredSize(new Dimension(80, 35)); // Smaller width
-
-        prevButton.addActionListener(e -> {
-            if (currentPage > 1) {
-                currentPage--;
-                updateTableData();
-                pageLabel.setText("Page " + currentPage);
-            }
-        });
-
-        nextButton.addActionListener(e -> {
-            int maxPages = (int) Math.ceil((double) allProfessors.size() / rowsPerPage);
-            if (currentPage < maxPages) {
-                currentPage++;
-                updateTableData();
-                pageLabel.setText("Page " + currentPage);
-            }
-        });
-
-        paginationPanel.add(prevButton);
-        paginationPanel.add(pageLabel);
-        paginationPanel.add(nextButton);
-
-        return paginationPanel;
+        // JPanel paginationPanel = createPaginationPanel();
+        // add(paginationPanel, BorderLayout.SOUTH);
     }
 
     private void updateTableData() {
