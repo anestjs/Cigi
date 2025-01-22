@@ -93,7 +93,7 @@ public class MainEnsignant {
             menuTitle.setForeground(Color.WHITE);
             menuTitle.setBorder(new EmptyBorder(20, 8, 20, 10));
 
-            String[] menuItems = {"Dashboard", "Announcements", "Notes", "Modules", "Settings", "Se Déconnecter"};
+            String[] menuItems = {"Dashboard", "Notes", "Modules", "Settings", "Se Déconnecter"};
             String[] iconPaths = {
                 "../../../../../resources/icons/teacher.png",
                 "../../../../../resources/icons/teacher.png",
@@ -197,13 +197,12 @@ public class MainEnsignant {
             contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
             JPanel dashboardPanel = new DashboardPanel();
-            JPanel announcementsPanel = new AnnouncementsPanel();
+         
             JPanel notesPanel = new NotesPanel();
             JPanel modulesPanel = new ModulesPanel();
             JPanel settingsPanel = new SettingsPanel();
 
             contentPanel.add(dashboardPanel, "Dashboard");
-            contentPanel.add(announcementsPanel, "Announcements");
             contentPanel.add(notesPanel, "Notes");
             contentPanel.add(modulesPanel, "Modules");
             contentPanel.add(settingsPanel, "Settings");

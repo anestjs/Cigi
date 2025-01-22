@@ -1,5 +1,6 @@
 package main.java.com.cigiproject.ui.admin;
 
+import main.java.com.cigiproject.services.SessionService; // Import SessionService
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -15,8 +16,10 @@ public class MainCigiUi {
     public static class CIGIDashboard extends JFrame {
 
         private JPanel contentPanel;
+        private SessionService sessionService; // Add SessionService instance
 
         public CIGIDashboard() {
+            sessionService = new SessionService(); // Initialize SessionService
             setTitle("Tableau de Bord CIGI - Gestion des Cycles d'Ingénieurs");
 
             setSize(1000, 700);
@@ -94,10 +97,8 @@ public class MainCigiUi {
             String[] iconPaths = {
                 "../../../../../resources/icons/student.png",
                 "../../../../../resources/icons/student.png",
-                // "../../../../../resources/icons/notes.png",
                 "../../../../../resources/icons/modules.png",
                 "../../../../../resources/icons/teacher.png",
-                // "../../../../../resources/icons/stats.png",
                 "../../../../../resources/icons/student.png",
                 "../../../../../resources/icons/logout.png"
             };
@@ -110,7 +111,7 @@ public class MainCigiUi {
                 String panelName = menuItems[i];
                 menuButton.addActionListener(e -> {
                     if (panelName.equals("Se Déconnecter")) {
-                        // Gestion de la déconnexion
+                        // Handle logout action
                         int confirm = JOptionPane.showConfirmDialog(
                             CIGIDashboard.this,
                             "Êtes-vous sûr de vouloir vous déconnecter ?",
@@ -118,8 +119,10 @@ public class MainCigiUi {
                             JOptionPane.YES_NO_OPTION
                         );
                         if (confirm == JOptionPane.YES_OPTION) {
-                            dispose(); // Ferme la fenêtre actuelle
-                            // Vous pouvez ajouter une logique de déconnexion ici (par exemple, revenir à l'écran de connexion)
+                            sessionService.invalidateSession(); // Invalidate the session
+                            dispose(); // Close the current window
+                            // Optionally, you can navigate back to the login screen here
+                            // Example: new LoginUI().setVisible(true);
                         }
                     } else {
                         CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
