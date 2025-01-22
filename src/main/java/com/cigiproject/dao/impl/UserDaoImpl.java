@@ -151,6 +151,11 @@ public class UserDaoImpl implements UserDao {
         return false;
     }
 
+
+
+
+   
+
     @Override
     public boolean delete(Integer id) {
         String sql = "DELETE FROM users WHERE user_id = ?";
@@ -252,6 +257,29 @@ public class UserDaoImpl implements UserDao {
         }
         return Optional.empty();
     }
+
+    
+    
+ 
+    public boolean update_user_setting(User user) {
+        String sql = "UPDATE users SET email = ?, password = ? WHERE user_id = ?";
+        
+        try {
+            this.conn = DatabaseConfig.connexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+    
+            stmt.setString(1, user.getEmail());      // Corrected index
+            stmt.setString(2, user.getPassword());   // Corrected index
+            stmt.setInt(3, user.getUser_id());       // Corrected index
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 
 
 }

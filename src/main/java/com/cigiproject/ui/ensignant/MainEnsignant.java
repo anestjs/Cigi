@@ -1,5 +1,6 @@
 package main.java.com.cigiproject.ui.ensignant;
 
+import main.java.com.cigiproject.services.SessionService;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -15,8 +16,10 @@ public class MainEnsignant {
     public static class EnsignantDashboard extends JFrame {
 
         private JPanel contentPanel;
+        private SessionService sessionService; // Add SessionService instance
 
         public EnsignantDashboard() {
+            sessionService = new SessionService(); // Initialize SessionService
             setTitle("Teacher Dashboard - CIGI");
 
             setSize(1000, 700);
@@ -116,8 +119,10 @@ public class MainEnsignant {
                             JOptionPane.YES_NO_OPTION
                         );
                         if (confirm == JOptionPane.YES_OPTION) {
+                            sessionService.invalidateSession(); // Invalidate the session
                             dispose(); // Close the current window
-                            // You can add additional logout logic here (e.g., return to login screen)
+                            // Optionally, you can navigate back to the login screen here
+                            // Example: new LoginUI().setVisible(true);
                         }
                     } else {
                         CardLayout cardLayout = (CardLayout) contentPanel.getLayout();

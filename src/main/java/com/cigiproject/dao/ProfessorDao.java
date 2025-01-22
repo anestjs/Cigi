@@ -27,6 +27,7 @@ public interface ProfessorDao extends BaseDao<Professor> {
     Grade getGradeForStudentInModule(Integer studentCne, Integer moduleId);
     
 
+    Optional<Professor> findByUser_UserId(Integer userId);
 
 
 }

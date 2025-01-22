@@ -47,6 +47,37 @@ public class ProfessorDaoImpl implements ProfessorDao {
         return Optional.empty();
     }
 
+
+    @Override
+    public Optional<Professor> findByUser_UserId(Integer userId) {
+        String sql = "SELECT p.*, u.* FROM professors p JOIN users u ON p.user_id = u.user_id WHERE u.user_id = ?";
+        try (Connection conn = DatabaseConfig.connexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId); // Set the user_id parameter
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Professor professor = new Professor();
+                    professor.setProfessor_id(rs.getInt("professor_id"));
+    
+                    // Fetch and set the associated User
+                    User user = new User();
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setFirstname(rs.getString("firstname"));
+                    user.setLastname(rs.getString("lastname"));
+                    user.setEmail(rs.getString("email"));
+                    user.setRole(Role.valueOf(rs.getString("role")));
+                    user.setPassword(rs.getString("password")); // Be cautious with passwords in real applications
+                    professor.setUser(user);
+    
+                    return Optional.of(professor);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log the exception (consider using a logger instead of printStackTrace)
+        }
+        return Optional.empty();
+    }
+
     @Override
     public List<Professor> findAll() {
         List<Professor> professors = new ArrayList<>();
@@ -79,6 +110,12 @@ public class ProfessorDaoImpl implements ProfessorDao {
     @Override
     public boolean save(Professor professor) {
         // First, save the User
+        UserDao userDao = new UserDaoImpl(); // Assuming you have a UserDaoImpl class
+        boolean isUserSaved = userDao.save(professor.getUser());
+
+        if (!isUserSaved) {
+            return false; // If the User couldn't be saved, return false
+        }
 
         // Now, save the Professor with the generated user_id
         String sql = "INSERT INTO professors (user_id) VALUES (?)";

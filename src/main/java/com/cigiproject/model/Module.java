@@ -78,4 +78,10 @@ public class Module {
     public void setClassEntity(Class classEntity) {
         this.classEntity = classEntity;
     }
+
+
+    @Override
+    public String toString() {
+        return this.getName(); // Include the year in the string representation
+    }
 }

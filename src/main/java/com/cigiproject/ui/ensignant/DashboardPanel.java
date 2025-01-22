@@ -22,6 +22,7 @@ public class DashboardPanel extends JPanel {
         // Additional Content Section (Optional)
         JPanel additionalContentPanel = createAdditionalContentPanel();
         add(additionalContentPanel, BorderLayout.SOUTH);
+        
     }
 
     private JPanel createWelcomeCard() {
